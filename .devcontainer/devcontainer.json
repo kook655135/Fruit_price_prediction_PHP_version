@@ -7,7 +7,8 @@
     ],
     "service": "app",
     "workspaceFolder": "/app",
-    "forwardPorts": [8080],
+    // 8080為airflow, 8081為PHP
+    "forwardPorts": [8080, 8081],
 
     "customizations": {
         "vscode": {
@@ -45,15 +46,6 @@
             }
         }
     },
-
-    // 容器創建後執行的指令 (使用 Array 語法，確保 Shell 執行穩定)
-    "postCreateCommand": [
-        "sh",
-        "./.devcontainer/postCreateCommand.sh"
-    ],
-
-    // 使用 Daemon (-D) 模式啟動 Airflow，並加入 DAG import timeout 120 秒
-    "postStartCommand": "bash -c 'export AIRFLOW__CORE__LOAD_EXAMPLES=False && export AIRFLOW__CORE__DAGS_FOLDER=/app/dags && export AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=120 && mkdir -p /app/airflow && cd /app && /root/.local/bin/poetry run airflow webserver -D && /root/.local/bin/poetry run airflow scheduler -D'",
 
     "remoteUser": "root"
 }

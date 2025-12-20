@@ -50,3 +50,6 @@ RUN /root/.local/bin/poetry config virtualenvs.in-project true && \
 
 # --- 3. 複製專案程式碼 ---
 COPY . .
+
+# 強迫 Airflow 啟動時重新讀取 docker-compose 的環境變數
+RUN rm -f /app/airflow/airflow.cfg

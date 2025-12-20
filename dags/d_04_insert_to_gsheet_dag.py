@@ -119,7 +119,7 @@ city_dict = {
 
 
 # 設定google sheet的URL
-gsheets_url = "https://docs.google.com/spreadsheets/d/1W_OelHOCt5EqatWQtzggBAi0VeYCInyiak_lDW-E57Q/edit?usp=sharing"
+gsheets_url = "https://docs.google.com/spreadsheets/d/1uIWklrNfFHXt7lsMApmXNVP1VbjkcXQ0NcEPH9dj6G4/edit?usp=sharing"
 
 # 設定要存取的分頁
 

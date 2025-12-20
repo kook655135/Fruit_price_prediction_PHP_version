@@ -3,17 +3,65 @@
 version: '3.8'
 
 services:
-  # 您的開發容器 (使用您穩定的 Dockerfile)
+  # 您的開發容器 (VS Code 連線用)
   app:
     build:
-      context: ..  # 從專案根目錄開始尋找
+      context: ..
       dockerfile: .devcontainer/Dockerfile
-
     volumes:
-      # 將專案目錄掛載到容器的 /app
       - ..:/app:cached
-
-    # Dev Container 相關配置，確保 VS Code 連線
     user: root
-
     command: sleep infinity
+    networks:
+      - airflow_network
+
+  # --- 新增 PHP 服務 ---
+  php-app:
+    image: php:8.1-apache
+    container_name: php_dev_server
+    ports:
+      - "8081:80"
+    volumes:
+      - ..:/var/www/html
+    networks:
+      - airflow_network
+
+  # --- Airflow Webserver ---
+  airflow-webserver:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: airflow_webserver
+    volumes:
+      - ..:/app:cached
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/dags
+      - AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT=120
+      - AIRFLOW_HOME=/app/airflow
+    ports:
+      - "8080:8080"
+    # 直接執行原本 postStartCommand 的核心指令
+    command: bash -c "cd /app && /root/.local/bin/poetry run airflow webserver"
+    networks:
+      - airflow_network
+
+  # --- 新增 Airflow Scheduler (Airflow 運作必需) ---
+  airflow-scheduler:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: airflow_scheduler
+    volumes:
+      - ..:/app:cached
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/dags
+      - AIRFLOW_HOME=/app/airflow
+    command: bash -c "cd /app && /root/.local/bin/poetry run airflow scheduler"
+    networks:
+      - airflow_network
+
+networks:
+  airflow_network:
+    driver: bridge
