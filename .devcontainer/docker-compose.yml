@@ -41,8 +41,11 @@ services:
       - AIRFLOW_HOME=/app/airflow
     ports:
       - "8080:8080"
-    # 直接執行原本 postStartCommand 的核心指令
-    command: bash -c "cd /app && /root/.local/bin/poetry run airflow webserver"
+    # 先初始化資料庫，再啟動 webserver
+    command: >
+      bash -c "cd /app && 
+      /root/.local/bin/poetry run airflow db init && 
+      /root/.local/bin/poetry run airflow webserver"
     networks:
       - airflow_network
 
@@ -60,6 +63,8 @@ services:
       - AIRFLOW__CORE__DAG_FILE_PROCESSOR_TIMEOUT=120
       - AIRFLOW__CORE__DAGS_FOLDER=/app/dags
       - AIRFLOW_HOME=/app/airflow
+    depends_on:
+      - airflow-webserver
     command: bash -c "cd /app && /root/.local/bin/poetry run airflow scheduler"
     networks:
       - airflow_network
