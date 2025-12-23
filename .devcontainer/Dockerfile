@@ -45,7 +45,8 @@ COPY pyproject.toml poetry.lock ./
 
 # 設定虛擬環境在專案目錄下 (.venv)
 # 安裝依賴 (不包含專案本身，因為程式碼還沒複製進來)
-RUN /root/.local/bin/poetry config virtualenvs.in-project true && \
+RUN /root/.local/bin/poetry config virtualenvs.in-project false && \
+    /root/.local/bin/poetry config virtualenvs.path /opt/venv && \
     /root/.local/bin/poetry install --no-root --no-interaction --no-ansi
 
 # --- 3. 複製專案程式碼 ---
