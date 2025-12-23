@@ -65,7 +65,7 @@ services:
       - AIRFLOW_HOME=/app/airflow
     depends_on:
       - airflow-webserver
-    command: bash -c "cd /app && /root/.local/bin/poetry run airflow scheduler"
+    command: bash -c "sleep 15 && cd /app && /root/.local/bin/poetry run airflow scheduler"
     networks:
       - airflow_network
 
