@@ -34,7 +34,7 @@ defaults = {
 
 # 設定資料庫連線資訊
 db_config = {
-    "host": "104.199.220.12",
+    "host": "10.140.0.13",
     "port": 3306,
     "user": "tjr103-team02",
     "passwd": "password",
