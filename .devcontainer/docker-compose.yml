@@ -17,12 +17,20 @@ services:
 
   # --- 新增 PHP 服務 ---
   php-app:
-    image: php:8.1-apache
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.php
     container_name: php_dev_server
+    restart: always
     ports:
       - "8081:80"
     volumes:
       - ..:/var/www/html
+    environment:
+      - DB_HOST=10.140.0.13  # 您目前的資料庫 IP
+      - DB_DATABASE=tjr103-team02
+      - DB_USERNAME=tjr103-team02
+      - DB_PASSWORD=password
     networks:
       - airflow_network
 
