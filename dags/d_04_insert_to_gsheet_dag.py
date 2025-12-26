@@ -31,13 +31,30 @@ sql_template_dict[
 ] = """
     WITH 
     -- CTE1 處理水果價格: 將實際價格與預測價格合併
-    price AS (
-        SELECT * FROM (
-            SELECT *,
-                ROW_NUMBER() OVER(PARTITION BY `date`, `crop_id` ORDER BY (CASE WHEN `mode` = 'actual' THEN 1 ELSE 2 END)) as rn
-            FROM price_prediction
-        ) t
-        WHERE rn = 1
+	max_actual AS(
+		SELECT
+			crop_id
+			,MAX(`date`) AS max_actual_date
+        FROM price_prediction
+        WHERE `mode` = 'actual' AND price IS NOT NULL
+        GROUP BY crop_id
+    )
+    ,price AS (
+		-- 先取得預測的價格
+        SELECT p.*
+        FROM 
+			price_prediction p
+            JOIN max_actual m
+				ON p.crop_id = m.crop_id
+		WHERE p.date > m.max_actual_date AND p.mode = 'prediction'
+		UNION ALL
+		-- 再取得實際的價格
+        SELECT p.*
+        FROM 
+			price_prediction p
+            JOIN max_actual m
+				ON p.crop_id = m.crop_id
+		WHERE p.date <= m.max_actual_date AND p.mode = 'actual'
     ),
     -- CTE2 取得各作物每日成交量，並換算成公噸
     volume_sum AS(
