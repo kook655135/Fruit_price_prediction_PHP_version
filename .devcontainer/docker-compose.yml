@@ -31,6 +31,13 @@ services:
       - DB_DATABASE=tjr103-team02
       - DB_USERNAME=tjr103-team02
       - DB_PASSWORD=password
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    command: >
+      bash -c "
+      cd /var/www/html/backend && 
+      chmod +x init.sh && 
+      ./init.sh"
     networks:
       - airflow_network
 
