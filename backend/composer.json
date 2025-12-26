@@ -10,7 +10,8 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.8"
+        "laravel/tinker": "^2.8" ,
+        "encore/laravel-admin": "1.*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -60,6 +61,10 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "abandoned": "ignore",
+            "ignore": ["PKSA-fwvh-pm3c-1m7b"]
         }
     },
     "minimum-stability": "stable",
