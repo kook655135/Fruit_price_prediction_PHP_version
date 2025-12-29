@@ -13,4 +13,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index')->name('home');
 
+    // 【核心修正】加入這行來對應 Modal 表單的請求
+    $router->get('export-report', 'HomeController@exportReport');
+
 });

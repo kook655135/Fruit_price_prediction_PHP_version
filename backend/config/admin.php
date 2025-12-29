@@ -58,7 +58,8 @@ return [
     */
     'route' => [
 
-        'prefix' => env('ADMIN_ROUTE_PREFIX', 'admin'),
+        // 【修改】將前綴改為空字串，讓網址變為 http://IP:8081/
+        'prefix' => '', 
 
         'namespace' => 'App\\Admin\\Controllers',
 
@@ -134,10 +135,11 @@ return [
         // Redirect to the specified URI when user is not authorized.
         'redirect_to' => 'auth/login',
 
-        // The URIs that should be excluded from authorization.
+        // 【修改】將 '/' 加入排除名單，進入首頁 Dashboard 時不要求登入
         'excepts' => [
             'auth/login',
             'auth/logout',
+            '/', 
         ],
     ],
 
@@ -223,7 +225,7 @@ return [
          * or specific method to path like: get:admin/auth/logs.
          */
         'except' => [
-            env('ADMIN_ROUTE_PREFIX', 'admin').'/auth/logs*',
+            'auth/logs*',
         ],
     ],
 
