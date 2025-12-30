@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\FruitPriceController;
+use App\Http\Controllers\Api\FruitDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,10 +19,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/fruit-price', [FruitPriceController::class, 'getFruitPrice']);
 
-/* 待補齊的 CUD 路由 (演示後再實作)
- Route::post('/fruit-price', [FruitPriceController::class, 'store']);
- Route::put('/fruit-price/{id}', [FruitPriceController::class, 'update']);
- Route::delete('/fruit-price/{id}', [FruitPriceController::class, 'destroy']);
- */
+ // 數據維護專用 API 組
+Route::prefix('v1/maintenance')->group(function () {
+    // 價格預測數據
+    Route::get('prices', [FruitDataController::class, 'getPriceIndex']);      // 查詢
+    Route::post('prices', [FruitDataController::class, 'storePrice']);        // 新增
+    Route::put('prices', [FruitDataController::class, 'updatePrice']);        // 修改
+    Route::delete('prices', [FruitDataController::class, 'deletePrice']);     // 刪除
+});

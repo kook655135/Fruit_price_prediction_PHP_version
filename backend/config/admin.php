@@ -135,11 +135,9 @@ return [
         // Redirect to the specified URI when user is not authorized.
         'redirect_to' => 'auth/login',
 
-        // 【修改】將 '/' 加入排除名單，進入首頁 Dashboard 時不要求登入
         'excepts' => [
             'auth/login',
             'auth/logout',
-            '/', 
         ],
     ],
 
