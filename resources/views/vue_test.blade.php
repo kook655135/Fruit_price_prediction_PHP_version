@@ -1,0 +1,1 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Vue API Test</title>@vite(["resources/css/app.css", "resources/js/app.js"])</head><body><div id="app"><fruit-price-dashboard></fruit-price-dashboard></div></body></html>

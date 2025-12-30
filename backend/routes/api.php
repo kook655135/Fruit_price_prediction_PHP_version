@@ -27,4 +27,9 @@ Route::prefix('v1/maintenance')->group(function () {
     Route::post('prices', [FruitDataController::class, 'storePrice']);        // 新增
     Route::put('prices', [FruitDataController::class, 'updatePrice']);        // 修改
     Route::delete('prices', [FruitDataController::class, 'deletePrice']);     // 刪除
-});
+});Route::get('/v1/maintenance/crops', [App\Http\Controllers\Api\FruitApiController::class, 'getCrops']);
+Route::get('/v1/maintenance/prices', [App\Http\Controllers\Api\FruitApiController::class, 'getPrices']);
+Route::get('/v1/maintenance/crops', [App\Http\Controllers\Api\FruitApiController::class, 'getCrops']);
+Route::get('/v1/maintenance/prices', [App\Http\Controllers\Api\FruitApiController::class, 'getPrices']);
+Route::get('/v1/maintenance/crops', [App\Http\Controllers\Api\FruitApiController::class, 'getCrops']);
+Route::get('/v1/maintenance/prices', [App\Http\Controllers\Api\FruitApiController::class, 'getPrices']);

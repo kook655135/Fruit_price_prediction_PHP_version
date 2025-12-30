@@ -1,0 +1,1 @@
+import './bootstrap'; import { createApp } from 'vue'; import FruitPriceDashboard from './components/FruitPriceDashboard.vue'; const app = createApp({}); app.component('fruit-price-dashboard', FruitPriceDashboard); app.mount('#app');

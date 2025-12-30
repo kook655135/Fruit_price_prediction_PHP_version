@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/vue-api-test', function () { return view('vue_test'); });
+Route::get('/vue-api-test', function () { return view('vue_test'); });
+Route::get('/vue-api-test', function () { return view('vue_test'); });
