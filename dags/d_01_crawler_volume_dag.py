@@ -187,7 +187,7 @@ with DAG(
     dag_id="d_01_crawler_volume_dag",
     description="每日抓取台灣水果行情（API）",
     start_date=pendulum.datetime(2020, 1, 1, tz="Asia/Taipei"),
-    schedule="00 5 * * *",
+    schedule="30 7 * * *",
     catchup=False,
     tags=["fruit", "moa", "mysql"],
     is_paused_upon_creation=False,
