@@ -31,7 +31,14 @@ WORKDIR /var/www/html
 # 修改 Apache 配置
 ENV APACHE_DOCUMENT_ROOT /var/www/html/backend/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+
+# 修正 Apache 權限設定 (解決 Permission Denied 問題)
+RUN echo "<Directory \${APACHE_DOCUMENT_ROOT}>" > /etc/apache2/conf-available/laravel.conf && \
+    echo "    Options Indexes FollowSymLinks" >> /etc/apache2/conf-available/laravel.conf && \
+    echo "    AllowOverride All" >> /etc/apache2/conf-available/laravel.conf && \
+    echo "    Require all granted" >> /etc/apache2/conf-available/laravel.conf && \
+    echo "</Directory>" >> /etc/apache2/conf-available/laravel.conf && \
+    a2enconf laravel
 
 # 5. 設定 Composer 與 Git 環境 (解決你剛才遇到的所有報錯)
 ENV COMPOSER_ALLOW_SUPERUSER=1

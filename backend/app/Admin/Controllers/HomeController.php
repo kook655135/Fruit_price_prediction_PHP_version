@@ -59,13 +59,13 @@ class HomeController extends Controller
 
         foreach($priceDb as $idx => $r) {
             $dates[] = date('Y/m/d', strtotime($r->date)); 
-            $volumes[] = round($r->volume_ton, 2);
+            $volumes[] = round((float)$r->volume_ton, 2);
             if (date('Y-m-d', strtotime($r->date)) == $todayRaw) $todayIndex = $idx;
             if($r->mode == 'actual') { 
-                $actualP[] = $r->price; $predictP[] = null; 
+                $actualP[] = (float)$r->price; $predictP[] = null; 
                 if($r->price > 0) { $totalP += $r->price; $countP++; $priceForKpi[] = $r->price; }
             } else { 
-                $actualP[] = null; $predictP[] = $r->price; 
+                $actualP[] = null; $predictP[] = (float)$r->price; 
             }
         }
         
@@ -209,11 +209,40 @@ class HomeController extends Controller
                             }
                             (function() {
                                 var trendChart = echarts.init(document.getElementById("trend-chart"));
-                                trendChart.setOption({ tooltip: { trigger: "axis" }, legend: { bottom: 0, itemWidth: 10, textStyle: {fontSize: 9} }, grid: { top: 35, bottom: 45, left: 35, right: 35 }, xAxis: { type: "category", data: '.json_encode($dates).', axisLabel: { fontSize: 8 } }, yAxis: [{ type: "value", name: "成交價(元/公斤)", nameTextStyle: {fontSize: 9}, axisLabel: {fontSize: 8} }, { type: "value", name: "交易量(公噸)", nameTextStyle: {fontSize: 9}, position: "right", splitLine: {show: false}, axisLabel: {fontSize: 8} }], series: [{ name: "交易量", type: "bar", yAxisIndex: 1, data: '.json_encode($volumes).', color: "#ffe0b2" }, { name: "實際價格", type: "line", data: '.json_encode($actualP).', color: "#d32f2f", smooth: true, connectNulls: true, markLine: { symbol: ["none", "none"], data: [{yAxis: '.$avgPrice.', label:{formatter: "平均 $'.$avgPrice.'", position: "middle", fontSize:8}}, {xAxis: '.($todayIndex != -1 ? $todayIndex : "null").', label:{formatter: "Today ('.$todayDisplay.')", position: "end", fontSize:8}, lineStyle: {color: "#d32f2f", type: "dashed"}}] } }, { name: "預測價格", type: "line", data: '.json_encode($predictP).', color: "#388e3c", smooth: true, connectNulls: true, lineStyle: {type: "dashed"} }] });
+                                
+                                // 如果沒有資料，顯示提示訊息；否則正常顯示圖表
+                                if ('.json_encode($dates).'.length === 0) {
+                                    trendChart.setOption({
+                                        title: {
+                                            text: "所選區間無交易資料",
+                                            left: "center",
+                                            top: "center",
+                                            textStyle: { color: "#999", fontSize: 14, fontWeight: "normal" }
+                                        }
+                                    });
+                                } else {
+                                    var markLineData = [];
+                                    if ('.$avgPrice.' > 0) markLineData.push({yAxis: '.$avgPrice.', label:{formatter: "平均 $'.$avgPrice.'", position: "middle", fontSize:8}});
+                                    if ('.($todayIndex != -1 ? 'true' : 'false').') markLineData.push({xAxis: '.$todayIndex.', label:{formatter: "Today ('.$todayDisplay.')", position: "end", fontSize:8}, lineStyle: {color: "#d32f2f", type: "dashed"}});
+
+                                    trendChart.setOption({ 
+                                        tooltip: { trigger: "axis" }, 
+                                        legend: { bottom: 0, itemWidth: 10, textStyle: {fontSize: 9} }, 
+                                        grid: { top: 35, bottom: 45, left: 35, right: 35 }, 
+                                        xAxis: { type: "category", data: '.json_encode($dates).', axisLabel: { fontSize: 8 } }, 
+                                        yAxis: [{ type: "value", name: "成交價(元/公斤)", nameTextStyle: {fontSize: 9}, axisLabel: {fontSize: 8} }, { type: "value", name: "交易量(公噸)", nameTextStyle: {fontSize: 9}, position: "right", splitLine: {show: false}, axisLabel: {fontSize: 8} }], 
+                                        series: [
+                                            { name: "交易量", type: "bar", yAxisIndex: 1, data: '.json_encode($volumes).', color: "#ffe0b2" }, 
+                                            { name: "實際價格", type: "line", data: '.json_encode($actualP).', color: "#d32f2f", smooth: true, connectNulls: true, markLine: { symbol: ["none", "none"], data: markLineData } }, 
+                                            { name: "預測價格", type: "line", data: '.json_encode($predictP).', color: "#388e3c", smooth: true, connectNulls: true, lineStyle: {type: "dashed"} }
+                                        ] 
+                                    });
+                                }
+
                                 mapChart = echarts.init(document.getElementById("taiwan-map"));
                                 fetch("/assets/json/taiwan_map.json").then(res => res.json()).then(geoJson => {
                                     echarts.registerMap("taiwan", geoJson); const mData = mapSource.harvest.data; const maxVal = Math.max(...mData.map(d => d.value), 10);
-                                    mapChart.setOption({ tooltip: { trigger: "item", backgroundColor: "rgba(255, 255, 255, 0.9)", formatter: function(p) { if(!p.data) return p.name; return `<div style="font-weight:bold; border-bottom:1px solid #eee; margin-bottom:5px;">縣市：<span style="float:right;">${p.data.name}</span></div><div>種植(公頃)：<span style="float:right; font-weight:bold;">${p.data.p_area}</span></div><div>收穫(公頃)：<span style="float:right; font-weight:bold;">${p.data.h_area}</span></div><div>產量(公噸)：<span style="float:right; font-weight:bold;">${p.data.prod}</span></div><div style="margin-top:5px; color:#888; font-size:10px;">年度平均：</div><div>交易量(t)：<span style="float:right; font-weight:bold;">${p.data.year_avg_vol}</span></div><div style="color:#d32f2f;">平均價：<span style="float:right; font-weight:bold;">$${p.data.year_avg_price}</span></div>`; } }, visualMap: { min: 0, max: maxVal, left: "5%", bottom: "2%", itemHeight: 80, text: [Math.round(maxVal), "0"], textStyle: {fontSize: 9}, calculable: true, inRange: { color: ["#fff5f5", "#f28e8e", "#d32f2f"] } }, series: [{ type: "map", map: "taiwan", selectedMode: "multiple", nameProperty: "COUNTYNAME", label: { show: true, fontSize: 6 }, zoom: 5, center: [120.9738, 23.9738], data: mData }] });
+                                    mapChart.setOption({ tooltip: { trigger: "item", backgroundColor: "rgba(255, 255, 255, 0.9)", formatter: function(p) { if(!p.data) return p.name; return `<div style="font-weight:bold; border-bottom:1px solid #eee; margin-bottom:5px;">縣市：<span style="float:right;">${p.data.name}</span></div><div>種植(公頃)：<span style="float:right; font-weight:bold;">${p.data.p_area}</span></div><div>收穫(公頃)：<span style="float:right; font-weight:bold;">${p.data.h_area}</span></div><div>產量(公噸)：<span style="float:right; font-weight:bold;">${p.data.prod}</span></div><div style="margin-top:5px; color:#888; font-size:10px;">年度平均：</div><div>交易量(公噸)：<span style="float:right; font-weight:bold;">${p.data.year_avg_vol}</span></div><div style="color:#d32f2f;">平均價：<span style="float:right; font-weight:bold;">$${p.data.year_avg_price}</span></div>`; } }, visualMap: { min: 0, max: maxVal, left: "5%", bottom: "2%", itemHeight: 80, text: [Math.round(maxVal), "0"], textStyle: {fontSize: 9}, calculable: true, inRange: { color: ["#fff5f5", "#f28e8e", "#d32f2f"] } }, series: [{ type: "map", map: "taiwan", selectedMode: "multiple", nameProperty: "COUNTYNAME", label: { show: true, fontSize: 6 }, zoom: 5, center: [120.9738, 23.9738], data: mData }] });
                                     const preSelected = "'.$selected_cities_str.'".split(",").filter(x => x); preSelected.forEach(name => mapChart.dispatchAction({ type: "mapSelect", name: name }));
                                     mapChart.on("click", function(params) { if (params.componentType === "series") updateSelectionAndSubmit(params.name); });
                                 });
